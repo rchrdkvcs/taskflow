@@ -1,12 +1,13 @@
 services:
   db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_DB: ${DB_NAME:-taskflow}
       POSTGRES_USER: ${DB_USER:-taskflow}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?Définir DB_PASSWORD dans .env}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      # PostgreSQL 18 stocke PGDATA dans /var/lib/postgresql/18/docker.
+      - postgres_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
       interval: 5s

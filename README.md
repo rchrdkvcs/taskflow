@@ -16,7 +16,7 @@ docker compose up --build -d --wait
 
 L'application est accessible sur `http://localhost:8080` (port configurable avec `FRONT_PORT`). Nginx sert le front compilé, prend en charge le routage Vue et relaie `/api/...` vers l'API. L'API et PostgreSQL sont accessibles uniquement sur le réseau Compose. Le Dockerfile utilise les cibles `api` et `front` ; l'API démarre après le contrôle de santé PostgreSQL, puis le front après celui de l'API.
 
-Les variables sont documentées dans [`.env.example`](.env.example). Les données PostgreSQL sont conservées dans le volume `postgres_data` après un arrêt ou une reconstruction. Les identifiants de la base sont définis à la première initialisation du volume.
+Les variables sont documentées dans [`.env.example`](.env.example). Les données PostgreSQL 18 sont conservées dans le volume `postgres_data`, monté sur `/var/lib/postgresql`, après un arrêt ou une reconstruction. Les identifiants de la base sont définis à la première initialisation du volume.
 
 ```sh
 docker compose logs -f       # Journaux de la stack
@@ -39,7 +39,7 @@ navigateur ──HTTP──► front (fichiers statiques Vue.js)
 |---|---|---|---|
 | front | `front/` | Vue.js 3, Vite | Interface web. Compilée en fichiers statiques, à servir par un serveur web. |
 | api | `api/` | Node.js 24, Express 5 | API REST de gestion des tâches. Crée le schéma de la base au démarrage. |
-| base de données | — | PostgreSQL (version 15 ou ultérieure) | Stockage des tâches. Aucun code spécifique dans ce dépôt. |
+| base de données | — | PostgreSQL 18 | Stockage des tâches. Aucun code spécifique dans ce dépôt. |
 
 ## Structure du dépôt
 
