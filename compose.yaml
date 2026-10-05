@@ -1,0 +1,73 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-taskflow}
+      POSTGRES_USER: ${DB_USER:-taskflow}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Définir DB_PASSWORD dans .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      target: api
+    environment:
+      NODE_ENV: production
+      APP_ENV: ${APP_ENV:-production}
+      HOST: 0.0.0.0
+      PORT: ${PORT:-3000}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-taskflow}
+      DB_USER: ${DB_USER:-taskflow}
+      DB_PASSWORD: ${DB_PASSWORD:?Définir DB_PASSWORD dans .env}
+      DB_CONNECT_RETRIES: ${DB_CONNECT_RETRIES:-5}
+      DB_CONNECT_INTERVAL_MS: ${DB_CONNECT_INTERVAL_MS:-2000}
+      STRESS_MAX_MS: ${STRESS_MAX_MS:-5000}
+      SHUTDOWN_TIMEOUT_MS: ${SHUTDOWN_TIMEOUT_MS:-8000}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:' + process.env.PORT + '/readyz', { signal: AbortSignal.timeout(4000) }).then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    stop_grace_period: ${STOP_GRACE_PERIOD:-15s}
+    restart: unless-stopped
+
+  front:
+    build:
+      context: .
+      target: front
+    environment:
+      API_PORT: ${PORT:-3000}
+      NGINX_ENVSUBST_FILTER: ^API_PORT$$
+    ports:
+      - "${FRONT_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

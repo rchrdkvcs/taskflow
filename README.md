@@ -2,7 +2,28 @@
 
 Application web de gestion de tâches, utilisée comme projet fil rouge du module « Clusterisation de conteneurs ».
 
-Ce dépôt contient uniquement le **code source** de l'application. Il ne contient volontairement ni Dockerfile ni fichier Compose : leur écriture fait partie du travail demandé à partir de la séance 1.
+Ce dépôt contient le **code source** de l'application et sa configuration Docker pour construire et lancer toute la stack.
+
+## Exécution avec Docker Compose
+
+Prérequis : Docker avec Docker Compose.
+
+```sh
+cp .env.example .env
+# Modifier DB_PASSWORD dans .env avant le premier lancement.
+docker compose up --build -d --wait
+```
+
+L'application est accessible sur `http://localhost:8080` (port configurable avec `FRONT_PORT`). Nginx sert le front compilé, prend en charge le routage Vue et relaie `/api/...` vers l'API. L'API et PostgreSQL sont accessibles uniquement sur le réseau Compose. Le Dockerfile utilise les cibles `api` et `front` ; l'API démarre après le contrôle de santé PostgreSQL, puis le front après celui de l'API.
+
+Les variables sont documentées dans [`.env.example`](.env.example). Les données PostgreSQL sont conservées dans le volume `postgres_data` après un arrêt ou une reconstruction. Les identifiants de la base sont définis à la première initialisation du volume.
+
+```sh
+docker compose logs -f       # Journaux de la stack
+docker compose down          # Arrêt, sans supprimer les données
+```
+
+Pour supprimer également toutes les données PostgreSQL, utiliser `docker compose down -v`.
 
 ---
 

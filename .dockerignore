@@ -1,0 +1,26 @@
+# Historique Git, réglages locaux et fichiers système
+.git
+**/.DS_Store
+**/Thumbs.db
+**/.idea
+**/.vscode
+
+# Dépendances et artefacts : reconstruits dans les images
+**/node_modules
+**/dist
+**/coverage
+**/*.log
+**/npm-debug.log*
+
+# Configuration locale et secrets : jamais copiés dans une image
+**/.env
+**/.env.*
+!**/.env.example
+**/secrets
+**/*.pem
+**/*.key
+
+# Documentation et orchestration inutiles au build
+README.md
+compose*.yaml
+compose*.yml
