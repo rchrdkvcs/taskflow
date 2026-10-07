@@ -96,7 +96,6 @@ Ordre qui fonctionne :
 ```sh
 kubectl apply -f k8s/namespace.yaml
 kubectl apply -f k8s/pods/db.yaml
-# Attendre « ready to accept connections », relever l'IP, la reporter dans k8s/pods/api.yaml.
 kubectl apply -f k8s/pods/api.yaml
 ```
 

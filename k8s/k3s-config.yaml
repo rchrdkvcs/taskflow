@@ -1,15 +1,3 @@
-# Configuration du serveur k3s, à placer dans /etc/rancher/k3s/config.yaml
-# sur la VM avant installation ou réinstallation.
-#
-# Cluster du labo, administré depuis le poste avec le contexte kubectl k3s-lab :
-# - serveur : manager.k3s (k3s v1.36.5+k3s1, control-plane)
-# - agent   : worker.k3s, joint avec le jeton du serveur (le jeton ne figure pas ici)
-#
-# L'installation en place a utilisé les défauts de « k3s server » et
-# « k3s agent » : ce fichier n'était pas encore sur la VM. Les clés ci-dessous
-# consignent les réglages utiles pour relire le kubeconfig depuis le poste
-# et présenter le nom du labo au certificat de l'API.
-# Ce n'est pas un manifeste Kubernetes : kubectl apply ne doit pas le charger.
 write-kubeconfig-mode: "0644"
 tls-san:
   - manager.k3s
