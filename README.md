@@ -54,6 +54,14 @@ navigateur ──HTTP──► front (fichiers statiques Vue.js)
 │       ├── db.js            connexion PostgreSQL, création du schéma
 │       ├── logger.js        journalisation
 │       └── routes/tasks.js  ressource /api/tasks
+├── docs/
+│   └── notes-kubernetes.md  constats de la première mise en Pods
+├── k8s/
+│   ├── k3s-config.yaml      configuration du serveur k3s, pas un manifeste
+│   ├── namespace.yaml
+│   └── pods/
+│       ├── api.yaml
+│       └── db.yaml
 └── front/
     ├── package.json, package-lock.json
     ├── index.html
@@ -198,3 +206,19 @@ npm run dev
 ```
 
 L'application est alors accessible sur `http://localhost:5173`.
+
+---
+
+## Kubernetes — premiers Pods
+
+Les manifestes de la séance 4 décrivent un namespace `taskflow`, un Pod PostgreSQL et un Pod API. Il n'y a pas encore de Service, de volume ni de contrôleur. L'API joint la base par l'adresse IP du Pod `db`, écrite dans [`k8s/pods/api.yaml`](k8s/pods/api.yaml). Cette adresse change à chaque recréation du Pod. Le mot de passe dans les manifestes est un mot de passe de test.
+
+```sh
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/pods/db.yaml
+# Relever l'IP du Pod db, la reporter dans k8s/pods/api.yaml, puis :
+kubectl apply -f k8s/pods/api.yaml
+kubectl port-forward -n taskflow pod/api 3000:3000
+```
+
+`kubectl apply -f k8s/` ne convient pas : [`k8s/k3s-config.yaml`](k8s/k3s-config.yaml) est la configuration du binaire k3s. Les limites observées (IP, données, absence de recréation) sont dans [`docs/notes-kubernetes.md`](docs/notes-kubernetes.md). Le front n'est pas déployé à ce stade.

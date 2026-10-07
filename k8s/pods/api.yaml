@@ -1,0 +1,49 @@
+# Pod API TaskFlow, image publiée en séance 1 (rchrdkvcs/taskflow-api:1.0.0).
+# Le nom de service Compose « db » n'est pas résolu dans le cluster : il n'y a
+# pas encore de Service. DB_HOST reçoit donc l'adresse IP du Pod db.
+# Valeur provisoire, relevée après le démarrage de ce Pod : elle change
+# à chaque recréation et le manifeste doit alors être mis à jour.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api
+  namespace: taskflow
+  labels:
+    app: taskflow
+    component: api
+spec:
+  restartPolicy: Always
+  containers:
+    - name: api
+      image: docker.io/rchrdkvcs/taskflow-api:1.0.0
+      imagePullPolicy: IfNotPresent
+      ports:
+        - name: http
+          containerPort: 3000
+      env:
+        - name: NODE_ENV
+          value: production
+        - name: APP_ENV
+          value: production
+        - name: HOST
+          value: 0.0.0.0
+        - name: PORT
+          value: "3000"
+        - name: DB_HOST
+          value: 10.42.1.5
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: taskflow
+        - name: DB_USER
+          value: taskflow
+        - name: DB_PASSWORD
+          value: taskflow-test
+        - name: DB_CONNECT_RETRIES
+          value: "5"
+        - name: DB_CONNECT_INTERVAL_MS
+          value: "2000"
+        - name: STRESS_MAX_MS
+          value: "5000"
+        - name: SHUTDOWN_TIMEOUT_MS
+          value: "8000"

@@ -1,0 +1,9 @@
+# Namespace de l'application TaskFlow.
+# Chaque manifeste de Pod précise aussi metadata.namespace : un tiers qui
+# applique les fichiers n'a pas à dépendre du namespace courant de son contexte.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: taskflow
+  labels:
+    app: taskflow
